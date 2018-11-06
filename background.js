@@ -21,7 +21,6 @@ async function getCatalog() {
 
 	const catolog = lookupTable.all_organisations
 		.map(org => org.url)
-		.map(url => url.replace('//', '//www.'))
 		.map(async function(url) {
 			return await (await fetch(url)).json()
 		});
@@ -36,15 +35,27 @@ getCatalog().then(response => {
 
 function getOrganisation(url) {
 	if (!url) {
+		console.error('getOrganisation() called without a URL');
 		return undefined;
 	}
 
 	// Make this use await getCatolog
-	const org = catalog
+	let org;
+
+	org = catalog
 		.filter(org => org.organisationUrls)
 		.filter(org => {
 			return new URL(org.organisationUrls[0]).hostname === new URL(url).hostname
 		});
 
-	return org.length ? org[0] : undefined;
+	if (org && org.length) return org[0];
+
+	// Sometimes the .organisationUrls property does not exist
+	org = catalog
+		.filter(org => org.privacyNoticeUrl)
+		.filter(org => {
+			return new URL(org.privacyNoticeUrl.url).hostname === new URL(url).hostname
+		});
+
+	if (org && org.length) return org[0];
 }
