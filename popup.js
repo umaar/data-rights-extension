@@ -1,37 +1,37 @@
-chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+chrome.tabs.query({currentWindow: true, active: true}, tabs => {
 	const currentTabURL = tabs[0].url;
 
-	chrome.runtime.sendMessage({url: currentTabURL}, function(org) {
-			console.log('the popup received a Message!', {org});
+	chrome.runtime.sendMessage({url: currentTabURL}, org => {
+		console.log('the popup received a Message!', {org});
 
-			let emailAddress = '';
-			let categoriesList = '';
-			let noticeURL = '';
-			let orgName = '';
+		let emailAddress = '';
+		let categoriesList = '';
+		let noticeURL = '';
+		let orgName = '';
 
-			if (org && org.privacyNoticeUrl && org.privacyNoticeUrl.url) {
-				noticeURL = org.privacyNoticeUrl.url;
-			}
+		if (org && org.privacyNoticeUrl && org.privacyNoticeUrl.url) {
+			noticeURL = org.privacyNoticeUrl.url;
+		}
 
-			if (org && org.organisationInformation && org.organisationInformation.name) {
-				orgName = org.organisationInformation.name;
-			}
+		if (org && org.organisationInformation && org.organisationInformation.name) {
+			orgName = org.organisationInformation.name;
+		}
 
-			if (org && org.dataProtectionOfficer && org.dataProtectionOfficer.contactInfo) {
-				emailAddress = org.dataProtectionOfficer.contactInfo.emailAddress || '';
-			}
+		if (org && org.dataProtectionOfficer && org.dataProtectionOfficer.contactInfo) {
+			emailAddress = org.dataProtectionOfficer.contactInfo.emailAddress || '';
+		}
 
-			if (org && org.dataCategoriesCollected && org.dataCategoriesCollected.list) {
-				categoriesList = org.dataCategoriesCollected.list.map(item => {
-					return `
+		if (org && org.dataCategoriesCollected && org.dataCategoriesCollected.list) {
+			categoriesList = org.dataCategoriesCollected.list.map(item => {
+				return `
 						<li>
 							${item.replace(/_/g, ' ')}
 						</li>
 					`;
-				}).join(' ');
-			}
+			}).join(' ');
+		}
 
-			const template = `
+		const template = `
 				<style>
 
 				body {
@@ -67,7 +67,7 @@ chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
 				    <p><a target="_blank" href="${noticeURL}" id="privacy-notice-url">Read the privacy notice</a></p>
 				</div>
 			`;
-			document.body.innerHTML = template;
+		document.body.innerHTML = template;
 	});
 });
 
